@@ -1,13 +1,5 @@
 import "dotenv/config";
-
-import {
-     Client,
-     Events,
-     GatewayIntentBits,
-     REST,
-     Routes,
-     ChannelType,
-} from "discord.js";
+import { Client, Events, GatewayIntentBits, REST, Routes, ChannelType, } from "discord.js";
 import { MusicPlayer } from "./provider";
 import { commands } from "./cmd";
 

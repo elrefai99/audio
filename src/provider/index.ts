@@ -1,14 +1,4 @@
-import {
-     AudioPlayer,
-     AudioPlayerStatus,
-     AudioResource,
-     createAudioPlayer,
-     createAudioResource,
-     joinVoiceChannel,
-     StreamType,
-     VoiceConnection,
-} from "@discordjs/voice";
-
+import { AudioPlayer, AudioPlayerStatus, AudioResource, createAudioPlayer, createAudioResource, joinVoiceChannel, StreamType, VoiceConnection, } from "@discordjs/voice";
 import { VoiceChannel } from "discord.js";
 import { spawn, ChildProcessWithoutNullStreams } from "node:child_process";
 import { createReadStream } from "node:fs";

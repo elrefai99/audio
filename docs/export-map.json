@@ -1,0 +1,63 @@
+{
+  "totalFiles": 4,
+  "totalExports": 6,
+  "totalImportEdges": 0,
+  "files": [
+    {
+      "file": "src/cmd/index.ts",
+      "exports": [
+        {
+          "name": "commands",
+          "kind": "value"
+        }
+      ],
+      "importedBy": [
+        "src/index.ts"
+      ],
+      "importsFrom": []
+    },
+    {
+      "file": "src/gen-import.ts",
+      "exports": [
+        {
+          "name": "commands",
+          "kind": "value"
+        },
+        {
+          "name": "MusicPlayer",
+          "kind": "value"
+        }
+      ],
+      "importedBy": [],
+      "importsFrom": []
+    },
+    {
+      "file": "src/gen.config.ts",
+      "exports": [
+        {
+          "name": "commands",
+          "kind": "value"
+        },
+        {
+          "name": "MusicPlayer",
+          "kind": "value"
+        }
+      ],
+      "importedBy": [],
+      "importsFrom": []
+    },
+    {
+      "file": "src/provider/index.ts",
+      "exports": [
+        {
+          "name": "MusicPlayer",
+          "kind": "value"
+        }
+      ],
+      "importedBy": [
+        "src/index.ts"
+      ],
+      "importsFrom": []
+    }
+  ]
+}
