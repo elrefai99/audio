@@ -1,4 +1,4 @@
-name: Test Build TypeScript Project
+name: Check Project Status
 
 on:
   push:
@@ -7,7 +7,8 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
+  id-token: write
 
 jobs:
   build:
@@ -22,23 +23,9 @@ jobs:
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: 'pnpm'
-
+          
       - name: Install dependencies & devDependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
 
       - name: Run TypeScript build
-        env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
         run: pnpm build
-
-  docker:
-    needs: build
-    uses: ./.github/workflows/deploy.aws.ecs.yml
-
-  notify:
-    needs: docker
-    uses: ./.github/workflows/notify.discord.yml
-    secrets: inherit
