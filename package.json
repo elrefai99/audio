@@ -1,0 +1,48 @@
+{
+  "name": "audio",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "format": "eslint . --fix",
+    "lint": "eslint .",
+    "dev": "concurrently \"NODE_ENV=development nodemon -L\" \"NODE_ENV=development npx ts-node ./src/MessageQueue/index.ts\"",
+    "dev:local": "concurrently \" nodemon -L\" \"npx ts-node ./src/MessageQueue/index.ts\"",
+    "build": "prisma generate && tsc -p tsconfig.build.json && node scripts/copy-generated.mjs",
+    "start": "concurrently \"TS_NODE_BASEURL=./dist node -r tsconfig-paths/register ./dist/src/app.js\" \"TS_NODE_BASEURL=./dist node -r tsconfig-paths/register ./dist/src/MessageQueue/index.js\"",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:cov": "vitest run --coverage",
+    "test:local": "NODE_ENV=test vitest run",
+    "test:e2e": "vitest run --reporter=verbose",
+    "test:e2e:watch": "vitest --reporter=verbose",
+    "taze:local": "npx taze -r",
+    "taze:back": "npx taze major",
+    "taze:update": "npx taze major -w",
+    "taze:patch": "npx taze patch",
+    "compress:ubuntu": "sudo zip -r project.zip .",
+    "gen:app": "gen-import --app-config --map",
+    "gen:check": "gen-import --strict=cycles",
+    "mcp": "tsx ./mcp/index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.15.1",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "uuid": "^14.0.2"
+  },
+  "devDependencies": {
+    "@discordjs/voice": "^0.19.2",
+    "@mohamed-elrefai/tsconfigs": "^1.0.2",
+    "@types/dotenv": "^8.2.3",
+    "@types/node": "^26.4.0",
+    "@types/uuid": "^11.0.0",
+    "discord.js": "^14.27.0",
+    "nodemon": "^3.1.14",
+    "redis": "^6.2.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^7.0.2"
+  }
+}
