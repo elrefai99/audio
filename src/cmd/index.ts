@@ -1,6 +1,4 @@
-import {
-     SlashCommandBuilder,
-} from "discord.js";
+import { SlashCommandBuilder } from "discord.js";
 
 export const commands = [
      new SlashCommandBuilder()
@@ -9,13 +7,7 @@ export const commands = [
 
      new SlashCommandBuilder()
           .setName("play")
-          .setDescription("Play an audio URL")
-          .addStringOption(option =>
-               option
-                    .setName("url")
-                    .setDescription("Direct audio URL")
-                    .setRequired(true),
-          ),
+          .setDescription("Start the 24/7 music"),
 
      new SlashCommandBuilder()
           .setName("pause")

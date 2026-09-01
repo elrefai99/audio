@@ -6,6 +6,7 @@ import {
      GatewayIntentBits,
      REST,
      Routes,
+     ChannelType,
 } from "discord.js";
 import { MusicPlayer } from "./provider";
 import { commands } from "./cmd";
@@ -15,17 +16,9 @@ const token = process.env.DISCORD_TOKEN;
 const clientId = process.env.CLIENT_ID;
 const guildId = process.env.GUILD_ID;
 
-if (!token) {
-     throw new Error("DISCORD_TOKEN is missing");
-}
-
-if (!clientId) {
-     throw new Error("CLIENT_ID is missing");
-}
-
-if (!guildId) {
-     throw new Error("GUILD_ID is missing");
-}
+if (!token) throw new Error("DISCORD_TOKEN is missing");
+if (!clientId) throw new Error("CLIENT_ID is missing");
+if (!guildId) throw new Error("GUILD_ID is missing");
 
 const client = new Client({
      intents: [
@@ -41,190 +34,138 @@ function getMusicPlayer(guildId: string): MusicPlayer {
 
      if (!player) {
           player = new MusicPlayer();
-
           musicPlayers.set(guildId, player);
      }
 
      return player;
 }
 
-client.once(
-     Events.ClientReady,
-     async readyClient => {
-          console.log(
-               `Logged in as ${readyClient.user.tag}`,
-          );
+client.once(Events.ClientReady, async readyClient => {
+     console.log(`Logged in as ${readyClient.user.tag}`);
 
-          const rest = new REST({
-               version: "10",
-          }).setToken(token);
+     const rest = new REST({ version: "10" })
+          .setToken(token);
 
-          await rest.put(
-               Routes.applicationGuildCommands(
-                    clientId,
-                    guildId,
-               ),
-               {
-                    body: commands,
-               },
-          );
+     await rest.put(
+          Routes.applicationGuildCommands(
+               clientId,
+               guildId,
+          ),
+          {
+               body: commands,
+          },
+     );
 
-          console.log("Slash commands registered");
-     },
-);
+     console.log("Slash commands registered");
+});
 
 client.on(
      Events.InteractionCreate,
      async interaction => {
-          if (!interaction.isChatInputCommand()) {
-               return;
-          }
+          if (!interaction.isChatInputCommand()) return;
 
-          const guild = interaction.guild;
-
-          if (!guild) {
+          if (!interaction.guild) {
                await interaction.reply({
-                    content: "This command can only be used inside a server.",
+                    content:
+                         "This command can only be used inside a server.",
                     ephemeral: true,
                });
 
                return;
           }
 
-          const player = getMusicPlayer(guild.id);
+          const player: any = getMusicPlayer(
+               interaction.guild.id,
+          );
 
-          switch (interaction.commandName) {
-               case "join": {
-                    const member: any = interaction.member;
+          if (interaction.commandName === "join") {
+               const member = interaction.member;
 
-                    if (
-                         !("voice" in member) ||
-                         !member.voice.channel
-                    ) {
-                         await interaction.reply({
-                              content: "You need to join a voice channel first.",
-                              ephemeral: true,
-                         });
+               if (
+                    !member ||
+                    !("voice" in member)
+               ) {
+                    await interaction.reply(
+                         "You must be in a voice channel.",
+                    );
 
-                         return;
-                    }
+                    return;
+               }
 
-                    const channel = member.voice.channel;
+               const voiceChannel =
+                    member.voice.channel;
 
-                    if (channel.type !== 2) {
-                         await interaction.reply({
-                              content: "This is not a voice channel.",
-                              ephemeral: true,
-                         });
+               if (
+                    !voiceChannel ||
+                    voiceChannel.type !==
+                    ChannelType.GuildVoice
+               ) {
+                    await interaction.reply(
+                         "You must be in a voice channel.",
+                    );
 
-                         return;
-                    }
+                    return;
+               }
 
-                    player.join(channel);
+               player.join(voiceChannel);
+
+               await interaction.reply(
+                    "Joined the voice channel.",
+               );
+
+               return;
+          }
+
+          if (interaction.commandName === "play") {
+               try {
+                    player.start24_7();
 
                     await interaction.reply(
-                         `Joined ${channel.name}`,
+                         "24/7 music started.",
                     );
-
-                    break;
-               }
-
-               case "play": {
-                    const member: any = interaction.member;
-
-                    if (
-                         !("voice" in member) ||
-                         !member.voice.channel
-                    ) {
-                         await interaction.reply({
-                              content: "Join a voice channel first.",
-                              ephemeral: true,
-                         });
-
-                         return;
-                    }
-
-                    const channel = member.voice.channel;
-
-                    if (channel.type !== 2) {
-                         await interaction.reply({
-                              content: "This is not a voice channel.",
-                              ephemeral: true,
-                         });
-
-                         return;
-                    }
-
-                    const url = interaction.options.getString(
-                         "url",
-                         true,
-                    );
-
-                    player.join(channel);
-
-                    try {
-                         player.play(url);
-
-                         await interaction.reply(
-                              `Playing: ${url}`,
-                         );
-                    } catch (error) {
-                         console.error(error);
-
-                         await interaction.reply({
-                              content: "Failed to play this audio.",
-                              ephemeral: true,
-                         });
-                    }
-
-                    break;
-               }
-
-               case "pause": {
-                    const paused = player.pause();
-
+               } catch (error) {
                     await interaction.reply(
-                         paused
-                              ? "Music paused."
-                              : "Nothing is currently playing.",
+                         "Bot must join a voice channel first.",
                     );
-
-                    break;
                }
 
-               case "resume": {
-                    const resumed = player.resume();
+               return;
+          }
 
-                    await interaction.reply(
-                         resumed
-                              ? "Music resumed."
-                              : "Music is not paused.",
-                    );
+          if (interaction.commandName === "pause") {
+               player.pause();
 
-                    break;
-               }
+               await interaction.reply("Paused.");
 
-               case "stop": {
-                    const stopped = player.stop();
+               return;
+          }
 
-                    await interaction.reply(
-                         stopped
-                              ? "Music stopped."
-                              : "Nothing is currently playing.",
-                    );
+          if (interaction.commandName === "resume") {
+               player.resume();
 
-                    break;
-               }
+               await interaction.reply("Resumed.");
 
-               case "leave": {
-                    player.leave();
+               return;
+          }
 
-                    await interaction.reply(
-                         "Left the voice channel.",
-                    );
+          if (interaction.commandName === "stop") {
+               player.stop();
 
-                    break;
-               }
+               await interaction.reply(
+                    "24/7 music stopped.",
+               );
+
+               return;
+          }
+
+          if (interaction.commandName === "leave") {
+               player.leave();
+
+               await interaction.reply(
+                    "Left the voice channel.",
+               );
+
+               return;
           }
      },
 );
